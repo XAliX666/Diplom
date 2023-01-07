@@ -8,7 +8,7 @@ backupsave="/home/backup"
 #backup path fo variable
 backuppath="$backupsave"/backup.-"$date.tar.gz"
 
-
+#добавить проверку на директорию переменые с директориями
 
 
 if tar -zcpf $backuppath $backupdir 
