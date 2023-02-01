@@ -27,7 +27,7 @@ chmod 700 ~/easy-rsa
 cd ~/easy-rsa 
 ./easyrsa init-pki
 #Install our deb-package 
-echo $passwd | sudo dpkg -i vars_0.1-1_all.deb &>> /dev/null
+echo $passwd | sudo dpkg -i vars_0.1-1_all.deb &>>/dev/null
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package vars"
@@ -80,7 +80,7 @@ echo $passwd | sudo chown $USER:$USER ~/client-configs/keys/*
 
 #STEP 7 Настройка OpenVPN
 #Install our deb-package 
-echo $passwd | sudo dpkg -i server-conf_0.1-1_all.deb &>> /dev/null
+echo $passwd | sudo dpkg -i server-conf_0.1-1_all.deb &>>/dev/null
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package server-conf_0.1-1_all.deb"
@@ -92,4 +92,31 @@ fi
 #STEP 8	Настройка конфигурации сети сервера OpenVPN
 echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' sysctl.conf 
 echo $passwd | sudo sysctl -p
+#STEP 9	Настройка брандмауэра
+#Выполняем скрипт в корневой директории.Our interface >> iptables.sh
+ip route list default | awk '{print $5}' | sed 's/$/ udp 1194/'>>./iptables.sh &>>/dev/null
+if [ $? -eq 0 ]
+then
+    echo "Successfully config iptables"
+else
+    echo "No Successfully config iptables >&2"
+    exit 1
+fi
 
+#STEP 10 Запуск OpenVPN
+#Так как сервис  openvpn не работает добавим его в автозагрузку
+echo $passwd | sudo systemctl -f enable openvpn-server@server.service
+#Start service openvpn
+sudo systemctl start openvpn-server@server.service
+sudo systemctl status openvpn-server@server.service &>>/dev/null
+if [ $? -eq 0 ]
+then
+    echo "Successfully working openvpn-server@server.service"
+else
+    echo "No Successfully working openvpn-server@server.service >&2"
+    exit 1
+fi
+
+#STEP 11	Создание инфраструктуры конфигурации клиентских систем
+#Cоздайте новую директорию для хранения файлов конфигурации клиентов в ранее созданной директории client-configs
+mkdir -p ~/client-configs/files
