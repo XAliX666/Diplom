@@ -92,4 +92,4 @@ fi
 #STEP 8	Настройка конфигурации сети сервера OpenVPN
 echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' sysctl.conf 
 echo $passwd | sudo sysctl -p
-#STEP 9	Настройка брандмауэра
+
