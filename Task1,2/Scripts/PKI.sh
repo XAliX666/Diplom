@@ -27,12 +27,12 @@ chmod 700 ~/easy-rsa
 cd ~/easy-rsa 
 ./easyrsa init-pki
 #Install our deb-package 
-echo $passwd | sudo dpkg -i vars_0.1-1_all.deb &>>/dev/null
+sudo dpkg -i vars_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package vars"
 else
-    echo "No intall deb-package var >&2"
+    echo "No install deb-package var >&2"
     exit 1
 fi
 #Enter passpharasa and common name enter. Ca.crt  это файл открытый ключ PKI
@@ -41,7 +41,7 @@ fi
 #STEP 3 Создание запроса сертификата и закрытого ключа сервера OpenVPN
 #Install openvpn
 cd ~/easy-rsa
-echo $passwd | yes | sudo apt-intall openvpn 
+echo $passwd | yes | sudo apt-install openvpn 
 cd ~/easy-rsa
 #Create query certification and key (common server)
 echo $sername | ./easyrsa gen-req server nopass
@@ -80,7 +80,7 @@ echo $passwd | sudo chown $USER:$USER ~/client-configs/keys/*
 
 #STEP 7 Настройка OpenVPN
 #Install our deb-package 
-echo $passwd | sudo dpkg -i server-conf_0.1-1_all.deb &>>/dev/null
+echo $passwd | sudo dpkg -i server-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package server-conf_0.1-1_all.deb"
@@ -95,7 +95,7 @@ echo $passwd | sudo sysctl -p
 #STEP 9	Настройка брандмауэра
 #Выполняем скрипт в корневой директории.Our interface >> iptables.sh
 ai=$(ip route list default | awk '{print $5}' | sed 's/$/ udp 1194/')
-sudo ./iptables.sh $ai &>>/dev/null
+sudo ./iptables.sh $ai &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully config iptables"
@@ -122,7 +122,7 @@ fi
 #Cоздайте новую директорию для хранения файлов конфигурации клиентов в ранее созданной директории client-configs
 mkdir -p ~/client-configs/files
 #запускаем деб пакет для переноса base.conf в ~/client-configs(изменим всё кроме ip вм)
-echo $passwd | sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null
+echo $passwd | sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package base-conf_0.1-1_all.deb"
@@ -136,7 +136,7 @@ cd ~/client-configs/
 ipvm=$(curl -s https://ipinfo.io/ip)
 sed -i '42c\remote '$ipvm' 1194' base.conf 
 #Start dep-package 
-echo $passwd | sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null
+echo $passwd | sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package make-config_0.1-1_all.deb"
@@ -152,7 +152,7 @@ cd ~/client-configs
 #Навский случай переносим ca.crt /client-configs/keys/
 cp ~/easyrsa/pki/ca.crt ~/client-configs/keys/
 #Start script make_config.sh with clietn1
-./make_config.sh client1 &>>/dev/null
+./make_config.sh client1 &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully finish script make_config"
