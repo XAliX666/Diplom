@@ -80,7 +80,8 @@ echo $passwd | sudo chown $USER:$USER ~/client-configs/keys/*
 
 #STEP 7 Настройка OpenVPN
 #Install our deb-package 
-echo $passwd | sudo dpkg -i server-conf_0.1-1_all.deb &>>/dev/null; echo $?;
+cd
+sudo dpkg -i server-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package server-conf_0.1-1_all.deb"
@@ -137,6 +138,7 @@ cd ~/client-configs/
 ipvm=$(curl -s https://ipinfo.io/ip)
 sed -i '42c\remote '$ipvm' 1194' ~/client-configs/base.conf 
 #Start dep-package 
+cd
 sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
