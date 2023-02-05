@@ -48,9 +48,9 @@ echo $passwd | yes | sudo apt-get install openvpn
 dpkg -s openvpn &>> /dev/null; echo $?;
 if [ $? -eq 0 ]
 then
-    echo "Successfully install easy-rsa"
+    echo "Successfully install openvpn"
 else
-    echo "No intall easy-rsa >&2"
+    echo "No intall openvpn >&2"
     exit 1
 fi
 cd ~/easy-rsa
@@ -65,8 +65,8 @@ cd ~/easy-rsa
 echo yes| ./easyrsa sign-req server server
 #Cерверный сертификат и сертификат удостоверяющего центра перемещаем в openvpn/server/
 cd
-sudo cp pki/issued/server.crt /etc/openvpn/server/
-sudo cp pki/ca.crt /etc/openvpn/server/
+sudo cp ~/easy-rsa/pki/issued/server.crt /etc/openvpn/server/
+sudo cp ~/easy-rsa/pki/ca.crt /etc/openvpn/server/
 
 #STEP 5 Настройка криптографических материалов OpenVPN
 cd ~/easy-rsa
