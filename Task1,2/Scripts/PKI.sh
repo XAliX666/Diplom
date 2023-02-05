@@ -27,6 +27,7 @@ chmod 700 ~/easy-rsa
 cd ~/easy-rsa 
 ./easyrsa init-pki
 #Install our deb-package 
+cd
 sudo dpkg -i vars_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
@@ -36,12 +37,22 @@ else
     exit 1
 fi
 #Enter passpharasa and common name enter. Ca.crt  это файл открытый ключ PKI
+cd ~/easy-rsa 
 ./easyrsa build-ca 
 
 #STEP 3 Создание запроса сертификата и закрытого ключа сервера OpenVPN
 #Install openvpn
 cd ~/easy-rsa
 echo $passwd | yes | sudo apt-get install openvpn 
+#Check install openvpn
+dpkg -s openvpn &>> /dev/null; echo $?;
+if [ $? -eq 0 ]
+then
+    echo "Successfully install easy-rsa"
+else
+    echo "No intall easy-rsa >&2"
+    exit 1
+fi
 cd ~/easy-rsa
 #Create query certification and key (common server)
 echo $sername | ./easyrsa gen-req server nopass
@@ -127,6 +138,7 @@ fi
 #Cоздайте новую директорию для хранения файлов конфигурации клиентов в ранее созданной директории client-configs
 mkdir -p ~/client-configs/files
 #запускаем деб пакет для переноса base.conf в ~/client-configs(изменим всё кроме ip вм)
+cd
 sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
