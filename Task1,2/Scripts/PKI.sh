@@ -45,12 +45,15 @@ echo $passwd | yes | sudo apt-get install openvpn
 cd ~/easy-rsa
 #Create query certification and key (common server)
 echo $sername | ./easyrsa gen-req server nopass
+cd
 echo $passwd | sudo cp ~/easy-rsa/pki/private/server.key /etc/openvpn/server/
 
 #STEP 4 Подпись запроса сертификата сервера OpenVPN
 # Yes and passpharasa 
+cd ~/easy-rsa
 echo yes| ./easyrsa sign-req server server
 #Cерверный сертификат и сертификат удостоверяющего центра перемещаем в openvpn/server/
+cd
 sudo cp pki/issued/server.crt /etc/openvpn/server/
 sudo cp pki/ca.crt /etc/openvpn/server/
 
