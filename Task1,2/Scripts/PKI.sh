@@ -6,8 +6,8 @@ read -r -p "Common name for server: " sername
 read -r -s -p "Password for sudo: " passwd
 echo $passwd | sudo -S apt-get update
 echo $passwd | yes | sudo -S apt-get install easy-rsa
- 
-dpkg -s easy-rsa &>> /dev/null
+ set -x
+dpkg -s easy-rsa &>> /dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install easy-rsa"
@@ -94,6 +94,7 @@ echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' /etc/sysctl.conf
 echo $passwd | sudo sysctl -p
 #STEP 9	Настройка брандмауэра
 #Выполняем скрипт в корневой директории.Our interface >> iptables.sh
+cd 
 ai=$(ip route list default | awk '{print $5}' | sed 's/$/ udp 1194/')
 sudo ./iptables.sh $ai &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
@@ -122,7 +123,7 @@ fi
 #Cоздайте новую директорию для хранения файлов конфигурации клиентов в ранее созданной директории client-configs
 mkdir -p ~/client-configs/files
 #запускаем деб пакет для переноса base.conf в ~/client-configs(изменим всё кроме ip вм)
-echo $passwd | sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
+sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package base-conf_0.1-1_all.deb"
@@ -134,9 +135,9 @@ fi
 cd ~/client-configs/
 #Check ip VM
 ipvm=$(curl -s https://ipinfo.io/ip)
-sed -i '42c\remote '$ipvm' 1194' base.conf 
+sed -i '42c\remote '$ipvm' 1194' ~/client-configs/base.conf 
 #Start dep-package 
-echo $passwd | sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null; echo $?;
+sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package make-config_0.1-1_all.deb"
