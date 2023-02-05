@@ -45,7 +45,7 @@ echo $passwd | yes | sudo apt-intall openvpn
 cd ~/easy-rsa
 #Create query certification and key (common server)
 echo $sername | ./easyrsa gen-req server nopass
-echo $passwd | sudo cp /home/sammy/easy-rsa/pki/private/server.key /etc/openvpn/server/
+echo $passwd | sudo cp ~/easy-rsa/pki/private/server.key /etc/openvpn/server/
 
 #STEP 4 Подпись запроса сертификата сервера OpenVPN
 # Yes and passpharasa 
@@ -94,7 +94,8 @@ echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' sysctl.conf
 echo $passwd | sudo sysctl -p
 #STEP 9	Настройка брандмауэра
 #Выполняем скрипт в корневой директории.Our interface >> iptables.sh
-ip route list default | awk '{print $5}' | sed 's/$/ udp 1194/'>>./iptables.sh &>>/dev/null
+ai=$(ip route list default | awk '{print $5}' | sed 's/$/ udp 1194/')
+sudo ./iptables.sh $ai &>>/dev/null
 if [ $? -eq 0 ]
 then
     echo "Successfully config iptables"
@@ -120,3 +121,45 @@ fi
 #STEP 11	Создание инфраструктуры конфигурации клиентских систем
 #Cоздайте новую директорию для хранения файлов конфигурации клиентов в ранее созданной директории client-configs
 mkdir -p ~/client-configs/files
+#запускаем деб пакет для переноса base.conf в ~/client-configs(изменим всё кроме ip вм)
+echo $passwd | sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null
+if [ $? -eq 0 ]
+then
+    echo "Successfully install deb-package base-conf_0.1-1_all.deb"
+else
+    echo "No intall deb-package base-conf_0.1-1_all.deb >&2"
+    exit 1
+fi
+#Add ip virtual mashine
+cd ~/client-configs/
+#Check ip VM
+ipvm=$(curl -s https://ipinfo.io/ip)
+sed -i '42c\remote '$ipvm' 1194' base.conf 
+#Start dep-package 
+echo $passwd | sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null
+if [ $? -eq 0 ]
+then
+    echo "Successfully install deb-package make-config_0.1-1_all.deb"
+else
+    echo "No intall deb-package make-config_0.1-1_all.deb >&2"
+    exit 1
+fi
+#Задаём права 
+sudo chmod 700 ~/client-configs/make_config.sh
+sudo chown $USER:$USER ~/client-configs/make_config.sh
+#STEP 12 Создание конфигураций клиентов
+cd ~/client-configs
+#Навский случай переносим ca.crt /client-configs/keys/
+cp ~/easyrsa/pki/ca.crt ~/client-configs/keys/
+#Start script make_config.sh with clietn1
+./make_config.sh client1 &>>/dev/null
+if [ $? -eq 0 ]
+then
+    echo "Successfully finish script make_config"
+else
+    echo "FAILED finish script make_config >&2"
+    exit 1
+fi
+cd ~/client-configs/files
+cat ~/client-configs/files/client1.ovpn 
+
