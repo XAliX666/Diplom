@@ -151,7 +151,7 @@ sudo chown $USER:$USER ~/client-configs/make_config.sh
 #STEP 12 Создание конфигураций клиентов
 cd ~/client-configs
 #Навский случай переносим ca.crt /client-configs/keys/
-cp ~/easyrsa/pki/ca.crt ~/client-configs/keys/
+cp ~/easy-rsa/pki/ca.crt ~/client-configs/keys/
 #Start script make_config.sh with clietn1
 ./make_config.sh client1 &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
