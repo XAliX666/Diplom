@@ -41,7 +41,7 @@ fi
 #STEP 3 Создание запроса сертификата и закрытого ключа сервера OpenVPN
 #Install openvpn
 cd ~/easy-rsa
-echo $passwd | yes | sudo apt-install openvpn 
+echo $passwd | yes | sudo apt-get install openvpn 
 cd ~/easy-rsa
 #Create query certification and key (common server)
 echo $sername | ./easyrsa gen-req server nopass
@@ -90,7 +90,7 @@ else
 fi
 
 #STEP 8	Настройка конфигурации сети сервера OpenVPN
-echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' sysctl.conf 
+echo $passwd | sudo sed -i '28c\net.ipv4.ip_forward=1' /etc/sysctl.conf 
 echo $passwd | sudo sysctl -p
 #STEP 9	Настройка брандмауэра
 #Выполняем скрипт в корневой директории.Our interface >> iptables.sh
@@ -109,7 +109,7 @@ fi
 echo $passwd | sudo systemctl -f enable openvpn-server@server.service
 #Start service openvpn
 sudo systemctl start openvpn-server@server.service
-sudo systemctl status openvpn-server@server.service &>>/dev/null
+sudo systemctl status openvpn-server@server.service &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully working openvpn-server@server.service"
