@@ -28,7 +28,7 @@ cd ~/easy-rsa
 ./easyrsa init-pki
 #Install our deb-package 
 cd
-sudo dpkg -i vars_0.1-1_all.deb &>>/dev/null; echo $?;
+sudo dpkg -i --instdir=$HOME vars_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package vars"
@@ -139,7 +139,7 @@ fi
 mkdir -p ~/client-configs/files
 #запускаем деб пакет для переноса base.conf в ~/client-configs(изменим всё кроме ip вм)
 cd
-sudo dpkg -i base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
+sudo dpkg -i --instdir=$HOME  base-conf_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package base-conf_0.1-1_all.deb"
@@ -154,7 +154,7 @@ ipvm=$(curl -s https://ipinfo.io/ip)
 sed -i '42c\remote '$ipvm' 1194' ~/client-configs/base.conf 
 #Start dep-package 
 cd
-sudo dpkg -i make-config_0.1-1_all.deb &>>/dev/null; echo $?;
+sudo dpkg -i --instdir=$HOME  make-config_0.1-1_all.deb &>>/dev/null; echo $?;
 if [ $? -eq 0 ]
 then
     echo "Successfully install deb-package make-config_0.1-1_all.deb"
